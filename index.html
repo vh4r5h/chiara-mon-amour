@@ -5,192 +5,200 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>For Chiara | My Universe</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@200;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;600&display=swap" rel="stylesheet">
     <style>
-        * { -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; overflow: hidden; background: #050505; font-family: 'Inter', sans-serif; touch-action: none; }
+        body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; touch-action: none; }
+        canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; }
+
+        #ui-wrapper { position: relative; z-index: 10; width: 100vw; height: 100vh; pointer-events: none; }
         
         #counter-container {
-            position: absolute; top: 40px; width: 100%; text-align: center; z-index: 20; color: white;
+            position: absolute; top: 10%; width: 100%; text-align: center; color: white;
         }
-        .timer-val { font-weight: 600; color: #ff4d4d; font-size: 1.2rem; text-shadow: 0 0 10px rgba(255,77,77,0.5); }
-        .timer-label { font-size: 0.7rem; opacity: 0.5; margin-right: 8px; }
+        .timer-val { font-weight: 600; color: #ff4d4d; font-size: 1.5rem; text-shadow: 0 0 15px rgba(255,77,77,0.6); }
+        .timer-label { font-size: 0.7rem; opacity: 0.5; margin-right: 10px; text-transform: uppercase; }
 
         #overlay {
             position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
-            text-align: center; color: white; pointer-events: none; z-index: 10; width: 100%;
+            text-align: center; color: white; width: 100%;
         }
+        .cursive { font-family: 'Dancing Script', cursive; font-size: 4.5rem; color: #ff4d4d; margin: 0; text-shadow: 0 0 20px rgba(255,77,77,0.4); }
         
-        .cursive { font-family: 'Dancing Script', cursive; font-size: 4rem; color: #ff4d4d; margin: 0; }
-        
-        .ui-layer { position: absolute; bottom: 12%; width: 100%; text-align: center; z-index: 20; }
-        
-        button {
-            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.2);
-            color: white; padding: 15px 35px; border-radius: 50px; cursor: pointer;
-            font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        .main-btn {
+            position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.3);
+            color: white; padding: 18px 40px; border-radius: 50px; cursor: pointer;
+            font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+            pointer-events: auto; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         }
 
         #final-letter {
-            position: fixed; inset: 0; background: #050505;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            padding: 20px; text-align: center; z-index: 100; opacity: 0; transition: opacity 0.8s ease;
+            position: fixed; inset: 0; z-index: 100; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.85); opacity: 0; transition: opacity 0.6s ease;
+            padding: 25px; box-sizing: border-box;
         }
 
-        .letter-text {
-            max-width: 90%; line-height: 1.6; font-weight: 300; font-size: 1rem;
-            color: #eee; z-index: 101; position: relative;
-        }
+        .letter-content { color: white; text-align: center; max-width: 500px; }
+        .letter-text { line-height: 1.7; font-weight: 300; font-size: 1.1rem; color: #e0e0e0; margin-bottom: 30px; }
 
-        .love-toggle {
-            position: absolute; top: 20px; background: #ff4d4d; border: none;
-            padding: 10px 20px; border-radius: 20px; color: white; font-weight: bold;
-            box-shadow: 0 5px 15px rgba(255,77,77,0.4); z-index: 110;
+        .love-toggle-btn {
+            background: #ff4d4d; border: none; color: white; padding: 12px 25px;
+            border-radius: 25px; font-weight: 600; font-size: 12px; margin-bottom: 25px;
+            cursor: pointer; box-shadow: 0 0 20px rgba(255,77,77,0.5);
         }
+        
+        .close-btn { color: white; opacity: 0.4; font-size: 10px; background: none; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="counter-container">
-        <p style="font-size: 0.5rem; opacity: 0.4; letter-spacing: 4px; margin-bottom: 5px;">EST. 18.09.2025</p>
-        <div>
-            <span class="timer-val" id="d">0</span><span class="timer-label">d</span>
-            <span class="timer-val" id="h">0</span><span class="timer-label">h</span>
-            <span class="timer-val" id="m">0</span><span class="timer-label">m</span>
-            <span class="timer-val" id="s">0</span><span class="timer-label">s</span>
+    <div id="ui-wrapper">
+        <div id="counter-container">
+            <p style="font-size: 0.6rem; opacity: 0.4; letter-spacing: 5px; margin-bottom: 8px;">SINCE 18.09.2025</p>
+            <div>
+                <span class="timer-val" id="d">0</span><span class="timer-label">d</span>
+                <span class="timer-val" id="h">0</span><span class="timer-label">h</span>
+                <span class="timer-val" id="m">0</span><span class="timer-label">m</span>
+                <span class="timer-val" id="s">0</span><span class="timer-label">s</span>
+            </div>
         </div>
-    </div>
 
-    <div id="overlay">
-        <h1 class="cursive">Chiara</h1>
-        <p style="opacity: 0.3; font-size: 8px; letter-spacing: 5px; text-transform: uppercase;">Mon soleil infini</p>
-    </div>
+        <div id="overlay">
+            <h1 class="cursive">Chiara</h1>
+            <p style="opacity: 0.3; font-size: 9px; letter-spacing: 6px; text-transform: uppercase; margin-top: 15px;">Mon soleil, mon tout</p>
+        </div>
 
-    <div class="ui-layer">
-        <button onclick="revealLetter()">Appuie ici, Chiara</button>
+        <button class="main-btn" onclick="revealLetter()">Appuie ici, Chiara</button>
     </div>
 
     <div id="final-letter">
-        <button class="love-toggle" id="loveBtn" onclick="toggleLoveMode()">LOVE MODE OFF</button>
-        <div id="parallax-content">
-            <h2 class="cursive" style="font-size: 2.5rem; margin-bottom: 20px;">Mon Univers</h2>
+        <button class="love-toggle-btn" onclick="toggleLove()">ACTIVATED LOVE MODE</button>
+        <div class="letter-content">
+            <h2 class="cursive" style="font-size: 2.8rem; margin-bottom: 20px;">Mon Univers</h2>
             <p class="letter-text">
                 Chiara,<br><br>
                 Je voulais build un truc qui repose pas sur les past memories pcq ce que je ressens pr toi, sa existe dans le présent H24.<br><br>
-                Comme c étoiles, tche la star de ma vie et tu rayonnes tujr dans mes pensées.<br><br>
+                Comme c étoiles, tche la star de ma vie et tu rayonnes tujr dans mes pensées même si parfois ya d jours je sens le monde est heavy, tu restes always le point fixe le plus important dans ma vie.<br><br>
                 Tu rends ma vie worth living. Mon amour pour toi c ♾️.<br><br>
-                <span style="color: #ff4d4d; font-family: 'Dancing Script'; font-size: 1.8rem;">Ton petit Harsh 💗</span>
+                <span style="color: #ff4d4d; font-family: 'Dancing Script'; font-size: 2rem;">Ton petit Harsh 💗</span>
             </p>
-            <button style="margin-top: 30px; opacity: 0.4; border: none; background: none; font-size: 9px;" onclick="closeLetter()">[ Fermer ]</button>
+            <button class="close-btn" onclick="closeLetter()">[ FERMER LE COSMOS ]</button>
         </div>
     </div>
 
     <script>
         let particles = [];
-        let hearts = [];
-        let isLetterOpen = false;
-        let loveMode = false;
-        const words = ["CHIARA", "18.09", "H24", "I LOVE YOU", "REINE", "MODEL"];
+        let rain = [];
+        let isLoveMode = false;
+        const starWords = ["CHIARA", "18.09", "H24", "I LOVE YOU", "REINE", "MODEL", "HARSH", "FACECARD"];
 
         function setup() {
-            let canvas = createCanvas(windowWidth, windowHeight);
-            canvas.parent(document.body);
-            // On réduit le nombre à 80 pour le mobile (fluidité max)
-            for (let i = 0; i < 80; i++) particles.push(new Particle());
-            textFont('Inter');
+            createCanvas(windowWidth, windowHeight);
+            for (let i = 0; i < 90; i++) particles.push(new Star());
         }
 
         function draw() {
-            background(5, 5, 8, loveMode ? 30 : 50);
-            
+            background(isLoveMode ? 25 : 5, 5, 10);
+
+            // Gérer les étoiles et mots
             particles.forEach(p => {
                 p.update();
                 p.show();
             });
 
-            if (isLetterOpen && loveMode) {
-                // Rain hearts and text
-                if (frameCount % 4 == 0) hearts.push(new RainElement());
-                for (let i = hearts.length - 1; i >= 0; i--) {
-                    hearts[i].update();
-                    hearts[i].show();
-                    if (hearts[i].y > height) hearts.splice(i, 1);
+            // Gérer la pluie d'amour
+            if (isLoveMode) {
+                if (frameCount % 3 == 0) rain.push(new LoveDrop());
+                for (let i = rain.length - 1; i >= 0; i--) {
+                    rain[i].update();
+                    rain[i].show();
+                    if (rain[i].off()) rain.splice(i, 1);
                 }
             }
         }
 
-        class Particle {
+        class Star {
             constructor() {
+                this.reset();
                 this.pos = createVector(random(width), random(height));
-                this.vel = createVector(random(-0.5, 0.5), random(-0.5, 0.5));
+            }
+            reset() {
+                this.pos = createVector(random(width), -10);
+                this.vel = createVector(random(-0.3, 0.3), random(0.2, 0.6));
+                this.isWord = random() > 0.92;
+                this.word = random(starWords);
                 this.size = random(1, 3);
             }
             update() {
                 this.pos.add(this.vel);
-                if (this.pos.x > width) this.pos.x = 0; if (this.pos.x < 0) this.pos.x = width;
-                if (this.pos.y > height) this.pos.y = 0; if (this.pos.y < 0) this.pos.y = height;
+                if (this.pos.y > height) this.pos.y = 0;
+                if (this.pos.x > width) this.pos.x = 0;
+                if (this.pos.x < 0) this.pos.x = width;
             }
             show() {
                 noStroke();
-                fill(255, 150);
-                ellipse(this.pos.x, this.pos.y, this.size);
+                if (this.isWord) {
+                    fill(255, 77, 77, 200);
+                    textSize(10);
+                    textAlign(CENTER);
+                    text(this.word, this.pos.x, this.pos.y);
+                } else {
+                    fill(255, 180);
+                    ellipse(this.pos.x, this.pos.y, this.size);
+                }
             }
         }
 
-        class RainElement {
+        class LoveDrop {
             constructor() {
                 this.x = random(width);
-                this.y = -20;
-                this.speed = random(3, 7);
-                this.type = random() > 0.4 ? "❤️" : "I LOVE YOU";
-                this.size = random(14, 24);
-                this.rot = random(TWO_PI);
+                this.y = -50;
+                this.speed = random(4, 8);
+                this.content = random() > 0.5 ? "❤️" : "I LOVE YOU";
+                this.size = random(16, 28);
             }
-            update() { 
-                this.y += this.speed; 
-                this.rot += 0.05;
-            }
+            update() { this.y += this.speed; }
             show() {
-                push();
-                translate(this.x, this.y);
-                rotate(sin(this.rot) * 0.2);
-                textAlign(CENTER);
                 fill(255, 77, 77);
                 textSize(this.size);
-                text(this.type, 0, 0);
-                pop();
+                textAlign(CENTER);
+                text(this.content, this.x, this.y);
             }
+            off() { return this.y > height + 50; }
         }
 
-        function toggleLoveMode() {
-            loveMode = !loveMode;
-            let btn = document.getElementById('loveBtn');
-            btn.innerText = loveMode ? "LOVE MODE ON ❤️" : "LOVE MODE OFF";
-            btn.style.background = loveMode ? "#ff4d4d" : "#444";
+        function toggleLove() {
+            isLoveMode = !isLoveMode;
+            document.querySelector('.love-toggle-btn').innerText = isLoveMode ? "LOVE MODE: ON 💖" : "ACTIVATED LOVE MODE";
         }
 
         function revealLetter() {
-            isLetterOpen = true;
-            let el = document.getElementById('final-letter');
+            const el = document.getElementById('final-letter');
             el.style.display = 'flex';
             setTimeout(() => el.style.opacity = '1', 50);
+            document.getElementById('ui-wrapper').style.opacity = '0';
         }
 
         function closeLetter() {
-            let el = document.getElementById('final-letter');
+            const el = document.getElementById('final-letter');
             el.style.opacity = '0';
-            setTimeout(() => { el.style.display = 'none'; isLetterOpen = false; loveMode = false; }, 800);
+            setTimeout(() => {
+                el.style.display = 'none';
+                document.getElementById('ui-wrapper').style.opacity = '1';
+                isLoveMode = false;
+            }, 600);
         }
 
-        // Timer Logic
-        const startDate = new Date("2025-09-18T00:00:00");
+        // Clock Logic
+        const start = new Date("2025-09-18T00:00:00");
         setInterval(() => {
-            const diff = new Date() - startDate;
-            document.getElementById('d').innerText = Math.floor(diff / 86400000);
-            document.getElementById('h').innerText = Math.floor((diff / 3600000) % 24);
-            document.getElementById('m').innerText = Math.floor((diff / 60000) % 60);
-            document.getElementById('s').innerText = Math.floor((diff / 1000) % 60);
+            const now = new Date();
+            const d = now - start;
+            document.getElementById('d').innerText = Math.floor(d/86400000);
+            document.getElementById('h').innerText = Math.floor((d/3600000)%24);
+            document.getElementById('m').innerText = Math.floor((d/60000)%60);
+            document.getElementById('s').innerText = Math.floor((d/1000)%60);
         }, 1000);
 
         function windowResized() { resizeCanvas(windowWidth, windowHeight); }
