@@ -5,57 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>For Chiara | My Universe</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@100;300;600&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; touch-action: none; }
         canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; }
 
-        #ui-wrapper { position: relative; z-index: 10; width: 100vw; height: 100vh; pointer-events: none; }
+        #ui-wrapper { position: relative; z-index: 10; width: 100vw; height: 100vh; pointer-events: none; transition: opacity 0.8s; }
         
         #counter-container {
-            position: absolute; top: 10%; width: 100%; text-align: center; color: white;
+            position: absolute; top: 8%; width: 100%; text-align: center; color: white;
         }
-        .timer-val { font-weight: 600; color: #ff4d4d; font-size: 1.5rem; text-shadow: 0 0 15px rgba(255,77,77,0.6); }
-        .timer-label { font-size: 0.7rem; opacity: 0.5; margin-right: 10px; text-transform: uppercase; }
+        .timer-val { font-weight: 600; color: #ff4d4d; font-size: 1.6rem; text-shadow: 0 0 20px rgba(255,77,77,0.8); letter-spacing: 1px; }
+        .timer-label { font-size: 0.65rem; opacity: 0.6; margin-right: 12px; text-transform: uppercase; font-weight: 100; }
 
         #overlay {
             position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
             text-align: center; color: white; width: 100%;
         }
-        .cursive { font-family: 'Dancing Script', cursive; font-size: 4.5rem; color: #ff4d4d; margin: 0; text-shadow: 0 0 20px rgba(255,77,77,0.4); }
+        .cursive { 
+            font-family: 'Dancing Script', cursive; font-size: 5rem; color: #ff4d4d; 
+            margin: 0; text-shadow: 0 0 30px rgba(255,77,77,0.5);
+            letter-spacing: 2px;
+        }
         
         .main-btn {
             position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.3);
-            color: white; padding: 18px 40px; border-radius: 50px; cursor: pointer;
-            font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
-            pointer-events: auto; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            background: linear-gradient(45deg, rgba(255,77,77,0.2), rgba(0,0,0,0.3));
+            border: 1px solid rgba(255,77,77,0.4);
+            color: white; padding: 20px 50px; border-radius: 50px; cursor: pointer;
+            font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+            pointer-events: auto; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            transition: all 0.4s;
         }
+        .main-btn:active { transform: translateX(-50%) scale(0.95); background: #ff4d4d; }
 
         #final-letter {
             position: fixed; inset: 0; z-index: 100; display: none;
             flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.85); opacity: 0; transition: opacity 0.6s ease;
-            padding: 25px; box-sizing: border-box;
+            background: radial-gradient(circle at center, rgba(30,0,0,0.95) 0%, rgba(0,0,0,0.98) 100%);
+            opacity: 0; transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 30px; box-sizing: border-box;
         }
 
-        .letter-content { color: white; text-align: center; max-width: 500px; }
-        .letter-text { line-height: 1.7; font-weight: 300; font-size: 1.1rem; color: #e0e0e0; margin-bottom: 30px; }
+        .letter-content { color: white; text-align: center; max-width: 500px; z-index: 101; }
+        .letter-text { 
+            line-height: 1.8; font-weight: 100; font-size: 1.1rem; color: #f5f5f5; 
+            margin-bottom: 35px; letter-spacing: 0.5px;
+        }
 
         .love-toggle-btn {
-            background: #ff4d4d; border: none; color: white; padding: 12px 25px;
-            border-radius: 25px; font-weight: 600; font-size: 12px; margin-bottom: 25px;
-            cursor: pointer; box-shadow: 0 0 20px rgba(255,77,77,0.5);
+            background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; 
+            padding: 10px 25px; border-radius: 25px; font-weight: 300; font-size: 10px; 
+            margin-bottom: 30px; cursor: pointer; letter-spacing: 2px;
+            transition: all 0.4s; pointer-events: auto;
         }
+        .love-toggle-btn.active { background: #ff4d4d; color: white; box-shadow: 0 0 30px rgba(255,77,77,0.6); }
         
-        .close-btn { color: white; opacity: 0.4; font-size: 10px; background: none; border: none; cursor: pointer; }
+        .close-btn { color: white; opacity: 0.3; font-size: 9px; background: none; border: none; cursor: pointer; letter-spacing: 3px; pointer-events: auto; }
     </style>
 </head>
 <body>
 
     <div id="ui-wrapper">
         <div id="counter-container">
-            <p style="font-size: 0.6rem; opacity: 0.4; letter-spacing: 5px; margin-bottom: 8px;">SINCE 18.09.2025</p>
+            <p style="font-size: 0.55rem; opacity: 0.5; letter-spacing: 6px; margin-bottom: 10px; font-weight: 100;">ETERNITY SINCE 18.09.2025</p>
             <div>
                 <span class="timer-val" id="d">0</span><span class="timer-label">d</span>
                 <span class="timer-val" id="h">0</span><span class="timer-label">h</span>
@@ -66,24 +79,24 @@
 
         <div id="overlay">
             <h1 class="cursive">Chiara</h1>
-            <p style="opacity: 0.3; font-size: 9px; letter-spacing: 6px; text-transform: uppercase; margin-top: 15px;">Mon soleil, mon tout</p>
+            <p style="opacity: 0.3; font-size: 9px; letter-spacing: 8px; text-transform: uppercase; margin-top: 20px; font-weight: 300;">Mon obsession, ma reine</p>
         </div>
 
-        <button class="main-btn" onclick="revealLetter()">Appuie ici, Chiara</button>
+        <button class="main-btn" onclick="revealLetter()">Reveal my heart</button>
     </div>
 
     <div id="final-letter">
-        <button class="love-toggle-btn" onclick="toggleLove()">ACTIVATED LOVE MODE</button>
+        <button class="love-toggle-btn" id="l-btn" onclick="toggleLove()">ACTIVER LOVE MODE</button>
         <div class="letter-content">
-            <h2 class="cursive" style="font-size: 2.8rem; margin-bottom: 20px;">Mon Univers</h2>
+            <h2 class="cursive" style="font-size: 3rem; margin-bottom: 25px;">Mon Univers</h2>
             <p class="letter-text">
                 Chiara,<br><br>
                 Je voulais build un truc qui repose pas sur les past memories pcq ce que je ressens pr toi, sa existe dans le présent H24.<br><br>
                 Comme c étoiles, tche la star de ma vie et tu rayonnes tujr dans mes pensées même si parfois ya d jours je sens le monde est heavy, tu restes always le point fixe le plus important dans ma vie.<br><br>
                 Tu rends ma vie worth living. Mon amour pour toi c ♾️.<br><br>
-                <span style="color: #ff4d4d; font-family: 'Dancing Script'; font-size: 2rem;">Ton petit Harsh 💗</span>
+                <span style="color: #ff4d4d; font-family: 'Dancing Script'; font-size: 2.2rem; text-shadow: 0 0 15px rgba(255,77,77,0.3);">Ton petit Harsh 💗</span>
             </p>
-            <button class="close-btn" onclick="closeLetter()">[ FERMER LE COSMOS ]</button>
+            <button class="close-btn" onclick="closeLetter()">[ CLOSE ]</button>
         </div>
     </div>
 
@@ -91,23 +104,21 @@
         let particles = [];
         let rain = [];
         let isLoveMode = false;
-        const starWords = ["CHIARA", "18.09", "H24", "I LOVE YOU", "REINE", "MODEL", "HARSH", "FACECARD"];
+        const starWords = ["CHIARA", "18.09", "H24", "MON AMOUR", "MA REINE", "MON BÉBÉ", "HARSH T'AIME", "MA CHÉRIE"];
 
         function setup() {
             createCanvas(windowWidth, windowHeight);
-            for (let i = 0; i < 90; i++) particles.push(new Star());
+            for (let i = 0; i < 85; i++) particles.push(new Star());
         }
 
         function draw() {
-            background(isLoveMode ? 25 : 5, 5, 10);
+            background(0, 0, 5, isLoveMode ? 40 : 60);
 
-            // Gérer les étoiles et mots
             particles.forEach(p => {
                 p.update();
                 p.show();
             });
 
-            // Gérer la pluie d'amour
             if (isLoveMode) {
                 if (frameCount % 3 == 0) rain.push(new LoveDrop());
                 for (let i = rain.length - 1; i >= 0; i--) {
@@ -120,31 +131,28 @@
 
         class Star {
             constructor() {
-                this.reset();
                 this.pos = createVector(random(width), random(height));
-            }
-            reset() {
-                this.pos = createVector(random(width), -10);
-                this.vel = createVector(random(-0.3, 0.3), random(0.2, 0.6));
-                this.isWord = random() > 0.92;
+                this.vel = createVector(random(-0.2, 0.2), random(0.1, 0.4));
+                this.isWord = random() > 0.93;
                 this.word = random(starWords);
-                this.size = random(1, 3);
+                this.size = random(1, 2.5);
+                this.alpha = random(100, 255);
             }
             update() {
                 this.pos.add(this.vel);
-                if (this.pos.y > height) this.pos.y = 0;
+                if (this.pos.y > height) this.pos.y = -10;
                 if (this.pos.x > width) this.pos.x = 0;
                 if (this.pos.x < 0) this.pos.x = width;
             }
             show() {
-                noStroke();
                 if (this.isWord) {
-                    fill(255, 77, 77, 200);
+                    fill(255, 77, 77, this.alpha);
                     textSize(10);
                     textAlign(CENTER);
                     text(this.word, this.pos.x, this.pos.y);
                 } else {
-                    fill(255, 180);
+                    fill(255, this.alpha);
+                    noStroke();
                     ellipse(this.pos.x, this.pos.y, this.size);
                 }
             }
@@ -154,9 +162,9 @@
             constructor() {
                 this.x = random(width);
                 this.y = -50;
-                this.speed = random(4, 8);
-                this.content = random() > 0.5 ? "❤️" : "I LOVE YOU";
-                this.size = random(16, 28);
+                this.speed = random(5, 10);
+                this.content = random() > 0.4 ? "❤️" : "I LOVE YOU";
+                this.size = random(16, 26);
             }
             update() { this.y += this.speed; }
             show() {
@@ -170,13 +178,15 @@
 
         function toggleLove() {
             isLoveMode = !isLoveMode;
-            document.querySelector('.love-toggle-btn').innerText = isLoveMode ? "LOVE MODE: ON 💖" : "ACTIVATED LOVE MODE";
+            let btn = document.getElementById('l-btn');
+            btn.classList.toggle('active');
+            btn.innerText = isLoveMode ? "LOVE MODE: ACTIVE 💖" : "ACTIVER LOVE MODE";
         }
 
         function revealLetter() {
             const el = document.getElementById('final-letter');
             el.style.display = 'flex';
-            setTimeout(() => el.style.opacity = '1', 50);
+            setTimeout(() => el.style.opacity = '1', 10);
             document.getElementById('ui-wrapper').style.opacity = '0';
         }
 
@@ -187,14 +197,14 @@
                 el.style.display = 'none';
                 document.getElementById('ui-wrapper').style.opacity = '1';
                 isLoveMode = false;
-            }, 600);
+                document.getElementById('l-btn').classList.remove('active');
+                document.getElementById('l-btn').innerText = "ACTIVER LOVE MODE";
+            }, 800);
         }
 
-        // Clock Logic
         const start = new Date("2025-09-18T00:00:00");
         setInterval(() => {
-            const now = new Date();
-            const d = now - start;
+            const d = new Date() - start;
             document.getElementById('d').innerText = Math.floor(d/86400000);
             document.getElementById('h').innerText = Math.floor((d/3600000)%24);
             document.getElementById('m').innerText = Math.floor((d/60000)%60);
