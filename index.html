@@ -9,7 +9,6 @@
     <style>
         body { margin: 0; padding: 0; overflow: hidden; background: #050505; font-family: 'Inter', sans-serif; cursor: crosshair; }
         
-        /* The Counter Style */
         #counter-container {
             position: absolute; top: 5%; width: 100%; text-align: center; z-index: 20;
             color: white; letter-spacing: 2px;
@@ -81,17 +80,21 @@
 
     <script>
         let particles = [];
-        const words = ["CHIARA", "18.09", "H24", "CHIARAxHARSH", "MA BOUFFE", "I LOVE YOU CHIARA", "CHIARA POTENTIAL MODEL", "TCHE MARI SEXY", "HARSH" "TON FACECARD HARMONIEUX" ];
+        // FIX: Added missing comma after "HARSH"
+        const words = ["CHIARA", "18.09", "H24", "CHIARAxHARSH", "MA BOUFFE", "I LOVE YOU CHIARA", "CHIARA POTENTIAL MODEL", "TCHE MARI SEXY", "HARSH", "TON FACECARD HARMONIEUX"];
 
         // Relationship Timer Logic
         const startDate = new Date("2025-09-18T00:00:00");
         function updateTimer() {
             const now = new Date();
             const diff = now - startDate;
-            document.getElementById('d').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
-            document.getElementById('h').innerText = Math.floor((diff / (1000 * 60 * 60)) % 24);
-            document.getElementById('m').innerText = Math.floor((diff / 1000 / 60) % 60);
-            document.getElementById('s').innerText = Math.floor((diff / 1000) % 60);
+            
+            if (diff > 0) {
+                document.getElementById('d').innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+                document.getElementById('h').innerText = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                document.getElementById('m').innerText = Math.floor((diff / 1000 / 60) % 60);
+                document.getElementById('s').innerText = Math.floor((diff / 1000) % 60);
+            }
         }
         setInterval(updateTimer, 1000);
         updateTimer();
@@ -105,7 +108,7 @@
         }
 
         function draw() {
-            background(5, 5, 8, 45); 
+            background(5, 5, 8, 60); // Slightly more trail effect
             particles.forEach(p => {
                 p.update();
                 p.show();
@@ -118,20 +121,20 @@
                 this.pos = createVector(random(width), random(height));
                 this.vel = createVector(random(-0.6, 0.6), random(-0.6, 0.6));
                 this.acc = createVector(0, 0);
-                this.maxSpeed = 2.8;
-                this.maxForce = 0.2;
-                this.isWord = random() > 0.92;
+                this.maxSpeed = 2.5;
+                this.maxForce = 0.15;
+                this.isWord = random() > 0.94;
                 this.word = random(words);
                 this.alpha = random(100, 255);
-                this.size = random(1, 2.5);
+                this.size = random(1, 3);
             }
 
             attract(targetX, targetY) {
                 let force = createVector(targetX, targetY);
                 force.sub(this.pos);
                 let d = force.mag();
-                if (d < 250) {
-                    let strength = map(d, 0, 250, 0.7, 0);
+                if (d < 200) {
+                    let strength = map(d, 0, 200, 0.5, 0);
                     force.setMag(strength);
                     this.acc.add(force);
                 }
@@ -142,6 +145,7 @@
                 this.vel.limit(this.maxSpeed);
                 this.pos.add(this.vel);
                 this.acc.mult(0);
+                
                 if (this.pos.x > width) this.pos.x = 0;
                 if (this.pos.x < 0) this.pos.x = width;
                 if (this.pos.y > height) this.pos.y = 0;
@@ -149,13 +153,14 @@
             }
 
             show() {
-                noStroke();
                 if (this.isWord) {
                     fill(255, 77, 77, this.alpha);
                     textSize(10);
+                    textAlign(CENTER);
                     text(this.word, this.pos.x, this.pos.y);
                 } else {
                     fill(255, this.alpha);
+                    noStroke();
                     ellipse(this.pos.x, this.pos.y, this.size);
                 }
             }
@@ -164,7 +169,7 @@
         function revealLetter() {
             const letter = document.getElementById('final-letter');
             letter.style.display = 'flex';
-            setTimeout(() => { letter.style.opacity = '1'; }, 10);
+            setTimeout(() => { letter.style.opacity = '1'; }, 50);
         }
 
         function closeLetter() {
