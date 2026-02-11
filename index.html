@@ -3,65 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>For Chiara | Glowing Universe</title>
+    <title>For Chiara | My Universe</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,600&family=Dancing+Script:wght@700&family=Inter:wght@100;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1@300;1@600&family=Dancing+Script:wght@700&family=Inter:wght@100;600&display=swap" rel="stylesheet">
     <style>
         body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; touch-action: none; }
         canvas { display: block; position: fixed; top: 0; left: 0; z-index: 1; }
         
         #ui-wrapper { position: relative; z-index: 10; width: 100vw; height: 100vh; pointer-events: none; }
         
-        #counter-container { position: absolute; top: 6%; width: 100%; text-align: center; color: white; }
-        .timer-val { font-weight: 600; color: #ff4d4d; font-size: 1.8rem; text-shadow: 0 0 25px #ff4d4d; }
-        .timer-label { font-size: 0.6rem; opacity: 0.5; margin-right: 10px; text-transform: uppercase; }
+        #counter-container { position: absolute; top: 5%; width: 100%; text-align: center; color: white; }
+        .timer-val { font-weight: 600; color: #ff4d4d; font-size: 2rem; text-shadow: 0 0 20px #ff4d4d; }
+        .timer-label { font-size: 0.6rem; opacity: 0.7; margin-right: 8px; text-transform: uppercase; }
 
-        #overlay { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; width: 100%; }
-        .cursive { font-family: 'Dancing Script', cursive; font-size: 5.5rem; color: #ff4d4d; margin: 0; text-shadow: 0 0 40px rgba(255,77,77,0.7); }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.05); opacity: 1; text-shadow: 0 0 30px #ff4d4d; }
-        }
-        .sexy-pulse { animation: pulse 1.2s infinite ease-in-out; }
+        #overlay { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; width: 100%; }
+        .cursive { font-family: 'Dancing Script', cursive; font-size: 6rem; color: #ff4d4d; margin: 0; text-shadow: 0 0 40px #ff4d4d; }
 
         .main-btn {
-            position: absolute; bottom: 15%; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 77, 77, 0.15); border: 1px solid #ff4d4d;
-            color: white; padding: 20px 55px; border-radius: 50px; font-size: 11px;
-            letter-spacing: 6px; text-transform: uppercase; pointer-events: auto;
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 0, 0, 0.2); border: 2px solid #ff4d4d;
+            color: white; padding: 22px 60px; border-radius: 50px; font-size: 12px;
+            letter-spacing: 5px; text-transform: uppercase; pointer-events: auto;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 0 30px rgba(255,77,77,0.3);
         }
 
         #final-letter {
             position: fixed; inset: 0; z-index: 100; display: none; flex-direction: column;
             align-items: center; justify-content: center;
-            background: radial-gradient(circle at center, rgba(30,0,0,0.98) 0%, #000 100%);
-            opacity: 0; transition: opacity 1s ease-in-out; padding: 30px; text-align: center;
+            background: rgba(0,0,0,0.95); opacity: 0; transition: opacity 0.8s; padding: 30px; text-align: center;
+        }
+
+        /* Soul Mode Glow Background */
+        #final-letter.soul-active {
+            background: radial-gradient(circle, rgba(60,0,0,1) 0%, rgba(0,0,0,1) 100%);
         }
 
         .letter-text { 
-            line-height: 2; font-family: 'Cormorant Garamond', serif; font-style: italic;
-            font-weight: 300; font-size: 1.45rem; color: #fff1f1; margin-bottom: 25px; 
-            max-width: 600px; text-shadow: 0 0 15px rgba(255,255,255,0.2);
+            line-height: 1.8; font-family: 'Cormorant Garamond', serif; font-style: italic;
+            font-size: 1.6rem; color: #fff; margin-bottom: 20px; max-width: 600px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
         .love-toggle-btn { 
-            background: transparent; border: 2px solid #ff4d4d; color: #ff4d4d; padding: 12px 30px; 
-            border-radius: 50px; font-size: 10px; margin-bottom: 30px; cursor: pointer;
-            pointer-events: auto; letter-spacing: 3px; font-weight: 600;
+            background: #ff4d4d; border: none; color: white; padding: 15px 35px; 
+            border-radius: 50px; font-size: 11px; margin-bottom: 30px; cursor: pointer;
+            pointer-events: auto; letter-spacing: 3px; font-weight: 600; box-shadow: 0 0 20px #ff4d4d;
         }
-        .love-toggle-btn.active { background: #ff4d4d; color: white; box-shadow: 0 0 50px #ff4d4d; }
 
-        .harsh-signature { color: #ff4d4d; font-family: 'Dancing Script'; font-size: 3rem; margin-top: 15px; display: block; }
-        .close-btn { color: rgba(255,255,255,0.2); font-size: 8px; border: none; background: none; pointer-events: auto; margin-top: 30px; letter-spacing: 4px; }
+        .harsh-signature { color: #ff4d4d; font-family: 'Dancing Script'; font-size: 3.5rem; display: block; margin-top: 10px; }
+        .close-btn { color: #fff; opacity: 0.3; font-size: 10px; border: none; background: none; pointer-events: auto; margin-top: 20px; letter-spacing: 5px; }
     </style>
 </head>
 <body>
 
     <div id="ui-wrapper">
         <div id="counter-container">
-            <p style="font-size: 0.6rem; opacity: 0.6; letter-spacing: 8px;">ETERNAL CONNECTION</p>
+            <p style="font-size: 0.7rem; letter-spacing: 8px; color: #ff4d4d;">♾️ SINCE 18.09.2025</p>
             <div>
                 <span class="timer-val" id="d">0</span><span class="timer-label">d</span>
                 <span class="timer-val" id="h">0</span><span class="timer-label">h</span>
@@ -70,24 +67,22 @@
             </div>
         </div>
         <div id="overlay">
-            <h1 class="cursive sexy-pulse">Chiara</h1>
-            <p style="opacity: 0.5; font-size: 9px; letter-spacing: 8px; text-transform: uppercase;">Leo & Aquarius</p>
+            <h1 class="cursive">Chiara</h1>
         </div>
-        <button class="main-btn" onclick="revealLetter()">Open My Soul</button>
+        <button class="main-btn" onclick="revealLetter()">REVEAL MY SOUL</button>
     </div>
 
     <div id="final-letter">
-        <button class="love-toggle-btn" id="l-btn" onclick="toggleLove()">ACTIVATE SOUL MODE</button>
-        <div id="letter-content" style="z-index: 110;">
-            <h2 class="cursive sexy-pulse" style="font-size: 3rem; margin-bottom: 20px;">Mon Univers</h2>
+        <button class="love-toggle-btn" id="l-btn" onclick="toggleLove()">ACTIVATE LOVE MODE</button>
+        <div style="z-index: 110;">
             <p class="letter-text">
-                Chiara,<br><br>
+                Chiara,<br>
                 Je voulais build un truc qui repose pas sur les past memories pcq ce que je ressens pr toi, sa existe dans le présent H24.<br><br>
                 Comme c étoiles, tche la star de ma vie et tu rayonnes tujr dans mes pensées...<br><br>
-                Tu rends ma vie worth living. Mon amour pour toi c ♾️.<br><br>
+                Tu rends ma vie worth living. Mon amour pour toi c ♾️.
                 <span class="harsh-signature">Ton petit Harsh 💗</span>
             </p>
-            <button class="close-btn" onclick="closeLetter()">[ DISAPPEAR ]</button>
+            <button class="close-btn" onclick="closeLetter()">[ BACK ]</button>
         </div>
     </div>
 
@@ -95,31 +90,31 @@
         let stars = [];
         let rain = [];
         let isLoveMode = false;
-        const sexyWords = ["CHIARA", "MA REINE", "MON AMOUR", "MON BÉBÉ", "HARSH T'AIME", "MA CHÉRIE"];
+        const words = ["CHIARA", "MA REINE", "MON AMOUR", "MON BÉBÉ", "HARSH T'AIME", "MA CHÉRIE"];
         
+        // Constellations Big & Sexy
         const leo = [[-80,-60], [-30,-75], [15,-45], [30,0], [15,45], [-45,60], [-90,30], [-80,-60]];
         const aquarius = [[-90,0], [-45,-30], [0,-15], [30,-45], [75,-30], [45,15], [15,60]];
 
         function setup() {
             createCanvas(windowWidth, windowHeight);
-            // 250 étoiles pour un effet waouh
-            for(let i=0; i<250; i++) stars.push(new Star());
+            for(let i=0; i<200; i++) stars.push(new Star());
         }
 
         function draw() {
-            background(0, 0, 5, isLoveMode ? 40 : 80);
-            
+            background(0, 0, 0, isLoveMode ? 40 : 100); 
+
             if (!isLoveMode) {
-                drawConstellation(width * 0.25, height * 0.3, leo, "LEO");
-                drawConstellation(width * 0.75, height * 0.7, aquarius, "AQUARIUS");
-                stroke(255, 77, 77, 35);
+                drawConst(width * 0.25, height * 0.3, leo);
+                drawConst(width * 0.75, height * 0.7, aquarius);
+                stroke(255, 77, 77, 40);
                 line(width * 0.25, height * 0.3, width * 0.75, height * 0.7);
             }
 
             stars.forEach(s => { s.update(); s.show(); });
 
             if (isLoveMode) {
-                if (frameCount % 3 === 0) rain.push(new LoveDrop());
+                if (frameCount % 2 === 0) rain.push(new LoveDrop());
                 for (let i = rain.length - 1; i >= 0; i--) {
                     rain[i].update(); rain[i].show();
                     if (rain[i].off()) rain.splice(i, 1);
@@ -127,37 +122,30 @@
             }
         }
 
-        function drawConstellation(x, y, points, label) {
+        function drawConst(x, y, pts) {
             push();
             translate(x, y);
-            let pulse = 1 + sin(frameCount * 0.05) * 0.1;
-            scale(pulse);
-            stroke(255, 77, 77, 180);
-            strokeWeight(1.5);
-            noFill();
-            beginShape();
-            points.forEach(p => {
-                vertex(p[0], p[1]);
-                fill(255, 255, 255, 200);
-                ellipse(p[0], p[1], 4);
+            stroke(255, 77, 77, 200);
+            strokeWeight(2);
+            pts.forEach(p => {
+                fill(255);
+                ellipse(p[0], p[1], 5);
                 noFill();
             });
-            endShape();
+            fill(255, 77, 77); noStroke();
+            textSize(12); textAlign(CENTER);
+            text("MON SOLEIL", 0, 90);
             pop();
         }
 
         class Star {
-            constructor() {
-                this.reset();
-                this.pos.y = random(height);
-            }
+            constructor() { this.reset(); this.pos.y = random(height); }
             reset() {
-                this.pos = createVector(random(width), -10);
-                this.vel = createVector(random(-0.1, 0.1), random(0.8, 2.5)); // Beaucoup plus rapide
-                this.isWord = random() > 0.94;
-                this.word = random(sexyWords);
-                this.size = random(1, 3);
-                this.glow = random(100, 255);
+                this.pos = createVector(random(width), -20);
+                this.vel = createVector(0, random(3, 8)); // VITESSE BOOSTE
+                this.isWord = random() > 0.92;
+                this.word = random(words);
+                this.size = random(1, 4);
             }
             update() {
                 this.pos.add(this.vel);
@@ -165,38 +153,24 @@
             }
             show() {
                 if (this.isWord) {
-                    fill(255, 77, 77, this.glow);
-                    textSize(11);
-                    textAlign(CENTER);
-                    text(this.word, this.pos.x, this.pos.y);
+                    fill(255, 77, 77); textSize(14); text(this.word, this.pos.x, this.pos.y);
                 } else {
-                    // Effet de halo pour le glow
-                    fill(255, 77, 77, 50);
-                    ellipse(this.pos.x, this.pos.y, this.size * 2);
-                    fill(255, this.glow);
-                    noStroke();
-                    ellipse(this.pos.x, this.pos.y, this.size);
+                    fill(255, 220); ellipse(this.pos.x, this.pos.y, this.size);
                 }
             }
         }
 
         class LoveDrop {
             constructor() {
-                this.x = random(width);
-                this.y = -50;
-                this.speed = random(8, 16);
-                this.txt = random() > 0.4 ? "❤️" : "I LOVE YOU";
-                this.size = random(20, 38);
+                this.x = random(width); this.y = -50;
+                this.speed = random(10, 20); // PLUIE ULTRA RAPIDE
+                this.txt = random() > 0.5 ? "❤️" : "I LOVE YOU";
             }
             update() { this.y += this.speed; }
             show() {
-                fill(255, 77, 77);
-                textSize(this.size);
-                textAlign(CENTER);
+                fill(255, 77, 77); textSize(25); textAlign(CENTER);
                 text(this.txt, this.x, this.y);
-                // Traînée lumineuse
-                fill(255, 77, 77, 80);
-                text(this.txt, this.x, this.y - 12);
+                fill(255, 0, 0, 100); text(this.txt, this.x, this.y - 15);
             }
             off() { return this.y > height + 100; }
         }
@@ -204,8 +178,10 @@
         function toggleLove() {
             isLoveMode = !isLoveMode;
             let btn = document.getElementById('l-btn');
-            btn.classList.toggle('active');
-            btn.innerText = isLoveMode ? "SOUL MODE: ACTIVE 💖" : "ACTIVATE SOUL MODE";
+            let letter = document.getElementById('final-letter');
+            btn.innerText = isLoveMode ? "LOVE MODE: ON 💖" : "ACTIVATE LOVE MODE";
+            if(isLoveMode) letter.classList.add('soul-active');
+            else letter.classList.remove('soul-active');
         }
 
         function revealLetter() {
@@ -222,7 +198,7 @@
                 el.style.display = 'none';
                 document.getElementById('ui-wrapper').style.opacity = '1';
                 isLoveMode = false;
-            }, 800);
+            }, 600);
         }
 
         const start = new Date("2025-09-18T00:00:00");
@@ -233,8 +209,8 @@
             document.getElementById('m').innerText = Math.floor((d/60000)%60);
             document.getElementById('s').innerText = Math.floor((d/1000)%60);
         }, 1000);
-
         function windowResized() { resizeCanvas(windowWidth, windowHeight); }
     </script>
 </body>
 </html>
+ 
